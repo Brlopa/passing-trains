@@ -506,7 +506,6 @@
       Trackside Schedule
     </div>
     <h1>Luzern Kreuzstutz</h1>
-    <p class="hero-subtitle">Alle Züge, die täglich an der Baselstrasse beim Kreuzstutz vorbeifahren — mit interpolierten Durchfahrtszeiten.</p>
     <p class="hero-meta">Standort: <span>47.054°N, 8.297°E</span> · Strecke: <span>Luzern ↔ Emmenbrücke</span></p>
   </header>
 
@@ -533,7 +532,7 @@
 // === TRAIN IMAGES (Wikimedia Commons — freely licensed) ===
 const TRAIN_IMAGES = {
   'IC':   { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/FFS_RABDe_500_Olten.jpg/640px-FFS_RABDe_500_Olten.jpg', credit: 'SBB RABDe 500 ICN — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:FFS_RABDe_500_Olten.jpg' },
-  'IC21': { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/FFS_RABDe_500_Olten.jpg/640px-FFS_RABDe_500_Olten.jpg', credit: 'SBB RABDe 500 ICN — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:FFS_RABDe_500_Olten.jpg' },
+  'IC21': { url: 'https://upload.wikimedia.org/wikipedia/commons/7/71/RABDe_500_ICN_EMU_-_54826117727.jpg?utm_source=en.wikipedia.org&utm_campaign=index&utm_content=original', credit: 'SBB RABDe 500 ICN — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:FFS_RABDe_500_Olten.jpg' },
   'EC':   { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/SBB_Re_420_Erstfeld.jpg/640px-SBB_Re_420_Erstfeld.jpg', credit: 'EuroCity SBB — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_Re_420_Erstfeld.jpg' },
   'IR':   { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/SBB_Giruno_bei_Muri_AG.jpg/640px-SBB_Giruno_bei_Muri_AG.jpg', credit: 'SBB Giruno IR — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_Giruno_bei_Muri_AG.jpg' },
   'IR15': { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/SBB_RABe_502_Twinsdexx_bei_Fribourg.jpg/640px-SBB_RABe_502_Twinsdexx_bei_Fribourg.jpg', credit: 'SBB RABe 502 Twindexx IR15 — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_RABe_502_Twinsdexx_bei_Fribourg.jpg' },
@@ -550,7 +549,7 @@ const TRAIN_IMAGES = {
   'S99':  { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/SBB_RABe_520_GTW_Luzern_S-Bahn.jpg/640px-SBB_RABe_520_GTW_Luzern_S-Bahn.jpg', credit: 'SBB RABe 520 GTW S-Bahn Luzern — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_RABe_520_GTW_Luzern_S-Bahn.jpg' },
 };
 
-const FALLBACK_IMG = 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/SBB_RABe_520_GTW_Luzern_S-Bahn.jpg/640px-SBB_RABe_520_GTW_Luzern_S-Bahn.jpg';
+const FALLBACK_IMG = 'https://www.sbb.ch/content/dam/internet/shared/images/zuege/giruno/Energieeffizienz.jpg/_jcr_content/renditions/cq5dam.web.1280.1280.jpeg';
 
 function getTrainImage(line) {
   return TRAIN_IMAGES[line] || { url: FALLBACK_IMG, credit: 'Wikimedia Commons', creditUrl: '#' };
