@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kreuzstutz — Zugdurchfahrten</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0a0a0f;
+      --bg-card: #12121a;
+      --bg-card-hover: #1a1a28;
+      --glass: rgba(255,255,255,0.03);
+      --glass-border: rgba(255,255,255,0.06);
+      --text-primary: #f0f0f5;
+      --text-secondary: rgba(240,240,245,0.55);
+      --text-muted: rgba(240,240,245,0.3);
+      --accent-red: #e03c31;
+      --accent-blue: #2d7dd2;
+      --color-ic: #e03c31;
+      --color-ec: #8b1a1a;
+      --color-ir: #e8590c;
+      --color-re: #2f9e44;
+      --color-s: #2d7dd2;
+      --color-s-alt: #7048e8;
+      --arrival: #10b981;
+      --departure: #f59e0b;
+      --shadow: 0 4px 24px rgba(0,0,0,0.4);
+    }
+
+    * { margin:0; padding:0; box-sizing:border-box; }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: var(--bg);
+      color: var(--text-primary);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* === HERO HEADER === */
+    .hero {
+      position: relative;
+      padding: 60px 40px 50px;
+      text-align: center;
+      overflow: hidden;
+    }
+
+    .hero::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -20%;
+      width: 140%;
+      height: 200%;
+      background: radial-gradient(ellipse at 50% 0%, rgba(224,60,49,0.08) 0%, transparent 60%),
+                  radial-gradient(ellipse at 80% 20%, rgba(45,125,210,0.06) 0%, transparent 50%);
+      pointer-events: none;
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      background: rgba(224,60,49,0.1);
+      border: 1px solid rgba(224,60,49,0.2);
+      border-radius: 100px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: var(--accent-red);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 20px;
+    }
+
+    .hero-badge svg { width:14px; height:14px; }
+
+    .hero h1 {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 12px;
+      background: linear-gradient(135deg, #fff 0%, rgba(255,255,255,0.7) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      font-weight: 400;
+      max-width: 600px;
+      margin: 0 auto 8px;
+    }
+
+    .hero-meta {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 16px;
+    }
+    .hero-meta span { color: var(--text-secondary); font-weight: 500; }
+
+    /* === STATS BAR === */
+    .stats-bar {
+      display: flex;
+      justify-content: center;
+      gap: 32px;
+      padding: 20px 40px;
+      margin: 0 auto 30px;
+      max-width: 800px;
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      text-align: center;
+    }
+    .stat-value {
+      font-size: 1.8rem;
+      font-weight: 800;
+      background: linear-gradient(135deg, #fff, rgba(255,255,255,0.8));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .stat-label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      margin-top: 2px;
+    }
+
+    /* === FILTER BAR === */
+    .filter-bar {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      padding: 12px 40px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .filter-btn {
+      padding: 7px 16px;
+      border: 1px solid var(--glass-border);
+      border-radius: 100px;
+      background: var(--glass);
+      color: var(--text-secondary);
+      font-family: inherit;
+      font-size: 0.78rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .filter-btn:hover {
+      background: rgba(255,255,255,0.08);
+      color: var(--text-primary);
+    }
+    .filter-btn.active {
+      background: rgba(224,60,49,0.15);
+      border-color: rgba(224,60,49,0.3);
+      color: var(--accent-red);
+    }
+
+    .filter-divider {
+      width: 1px;
+      height: 24px;
+      background: var(--glass-border);
+      margin: 0 6px;
+    }
+
+    .dir-btn { font-size: 0.85rem; }
+    .dir-btn.active.dir-an {
+      background: rgba(16,185,129,0.12);
+      border-color: rgba(16,185,129,0.3);
+      color: var(--arrival);
+    }
+    .dir-btn.active.dir-ab {
+      background: rgba(245,158,11,0.12);
+      border-color: rgba(245,158,11,0.3);
+      color: var(--departure);
+    }
+
+    /* === TIMELINE === */
+    .timeline-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 24px 60px;
+    }
+
+    .hour-group {
+      margin-bottom: 8px;
+    }
+
+    .hour-header {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      padding: 12px 0 8px;
+      position: sticky;
+      top: 0;
+      background: linear-gradient(180deg, var(--bg) 60%, transparent 100%);
+      z-index: 10;
+    }
+
+    .hour-time {
+      font-size: 1.6rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      min-width: 60px;
+      font-variant-numeric: tabular-nums;
+    }
+    .hour-line {
+      flex: 1;
+      height: 1px;
+      background: var(--glass-border);
+    }
+    .hour-count {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    .train-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 10px;
+      padding-left: 76px;
+    }
+
+    /* === TRAIN CARD === */
+    .train-card {
+      display: flex;
+      align-items: stretch;
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: 14px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.25s ease;
+    }
+    .train-card:hover {
+      background: var(--bg-card-hover);
+      border-color: rgba(255,255,255,0.12);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow);
+    }
+
+    .card-accent {
+      width: 4px;
+      flex-shrink: 0;
+    }
+    .card-accent.cat-ic, .card-accent.cat-ic21 { background: var(--color-ic); }
+    .card-accent.cat-ec { background: var(--color-ec); }
+    .card-accent.cat-ir, .card-accent.cat-ir15, .card-accent.cat-ir26, .card-accent.cat-ir27, .card-accent.cat-ir70, .card-accent.cat-ir75 { background: var(--color-ir); }
+    .card-accent.cat-re7, .card-accent.cat-re24 { background: var(--color-re); }
+    .card-accent.cat-s1, .card-accent.cat-s6, .card-accent.cat-s9 { background: var(--color-s); }
+    .card-accent.cat-s77, .card-accent.cat-s99 { background: var(--color-s-alt); }
+
+    .card-body {
+      flex: 1;
+      padding: 14px 16px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      min-width: 0;
+    }
+
+    .card-time-block {
+      text-align: center;
+      flex-shrink: 0;
+      min-width: 50px;
+    }
+    .card-time {
+      font-size: 1.3rem;
+      font-weight: 700;
+      font-variant-numeric: tabular-nums;
+      line-height: 1.1;
+    }
+    .card-time.time-an { color: var(--arrival); }
+    .card-time.time-ab { color: var(--departure); }
+    .card-dir-label {
+      font-size: 0.6rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      font-weight: 600;
+      margin-top: 3px;
+    }
+    .card-dir-label.dir-an { color: rgba(16,185,129,0.6); }
+    .card-dir-label.dir-ab { color: rgba(245,158,11,0.6); }
+
+    .card-info {
+      flex: 1;
+      min-width: 0;
+    }
+
+    .card-line-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 4px;
+    }
+
+    .line-badge {
+      padding: 3px 10px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #fff;
+      white-space: nowrap;
+    }
+    .line-badge.cat-ic, .line-badge.cat-ic21 { background: var(--color-ic); }
+    .line-badge.cat-ec { background: var(--color-ec); }
+    .line-badge.cat-ir, .line-badge.cat-ir15, .line-badge.cat-ir26, .line-badge.cat-ir27, .line-badge.cat-ir70, .line-badge.cat-ir75 { background: var(--color-ir); }
+    .line-badge.cat-re7, .line-badge.cat-re24 { background: var(--color-re); }
+    .line-badge.cat-s1, .line-badge.cat-s6, .line-badge.cat-s9 { background: var(--color-s); }
+    .line-badge.cat-s77, .line-badge.cat-s99 { background: var(--color-s-alt); }
+
+    .card-route {
+      font-size: 0.82rem;
+      color: var(--text-secondary);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .card-route-arrow {
+      color: var(--text-muted);
+      margin: 0 4px;
+    }
+
+    .card-luzern-time {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+      margin-top: 2px;
+    }
+
+    .card-img {
+      width: 100px;
+      height: 70px;
+      object-fit: cover;
+      flex-shrink: 0;
+      opacity: 0.85;
+      transition: opacity 0.2s;
+    }
+    .train-card:hover .card-img { opacity: 1; }
+
+    /* === MODAL === */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.7);
+      backdrop-filter: blur(8px);
+      z-index: 100;
+      justify-content: center;
+      align-items: center;
+      padding: 24px;
+    }
+    .modal-overlay.active { display: flex; }
+
+    .modal {
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      max-width: 480px;
+      width: 100%;
+      overflow: hidden;
+      box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+    }
+
+    .modal-img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+    }
+
+    .modal-body { padding: 28px; }
+
+    .modal-header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+    .modal-badge {
+      padding: 6px 16px;
+      border-radius: 8px;
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #fff;
+    }
+    .modal-time {
+      font-size: 1.6rem;
+      font-weight: 800;
+      font-variant-numeric: tabular-nums;
+    }
+    .modal-dir-badge {
+      margin-left: auto;
+      padding: 4px 12px;
+      border-radius: 100px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .modal-dir-badge.dir-an { background: rgba(16,185,129,0.12); color: var(--arrival); }
+    .modal-dir-badge.dir-ab { background: rgba(245,158,11,0.12); color: var(--departure); }
+
+    .modal-detail {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 10px 16px;
+      font-size: 0.9rem;
+    }
+    .modal-label { color: var(--text-muted); font-weight: 500; }
+    .modal-value { color: var(--text-primary); }
+
+    .modal-route-vis {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 24px;
+      padding: 16px;
+      background: rgba(255,255,255,0.02);
+      border: 1px solid var(--glass-border);
+      border-radius: 12px;
+    }
+    .route-station {
+      font-size: 0.85rem;
+      font-weight: 600;
+    }
+    .route-line {
+      flex: 1;
+      height: 2px;
+      background: linear-gradient(90deg, var(--text-muted) 0%, var(--text-muted) 100%);
+      position: relative;
+    }
+    .route-dot {
+      position: absolute;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-red);
+      box-shadow: 0 0 8px rgba(224,60,49,0.5);
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 16px;
+      right: 16px;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: none;
+      background: rgba(0,0,0,0.5);
+      color: #fff;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.2s;
+      z-index: 2;
+    }
+    .modal-close:hover { background: rgba(0,0,0,0.8); }
+
+    .modal-img-credit {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      text-align: center;
+      padding: 8px 28px 16px;
+    }
+    .modal-img-credit a { color: var(--text-muted); text-decoration: underline; }
+
+    /* === RESPONSIVE === */
+    @media (max-width: 768px) {
+      .hero { padding: 40px 20px 30px; }
+      .stats-bar { gap: 20px; }
+      .train-grid { padding-left: 0; grid-template-columns: 1fr; }
+      .filter-bar { padding: 12px 16px; }
+      .timeline-container { padding: 0 12px 40px; }
+      .card-img { width: 80px; height: 60px; }
+    }
+
+    /* === SCROLL ANIMATION === */
+    .train-card {
+      opacity: 0;
+      transform: translateY(12px);
+      animation: fadeUp 0.35s ease forwards;
+    }
+    @keyframes fadeUp {
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HERO -->
+  <header class="hero">
+    <div class="hero-badge">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+      Trackside Schedule
+    </div>
+    <h1>Luzern Kreuzstutz</h1>
+    <p class="hero-subtitle">Alle Züge, die täglich an der Baselstrasse beim Kreuzstutz vorbeifahren — mit interpolierten Durchfahrtszeiten.</p>
+    <p class="hero-meta">Standort: <span>47.054°N, 8.297°E</span> · Strecke: <span>Luzern ↔ Emmenbrücke</span></p>
+  </header>
+
+  <!-- STATS -->
+  <div class="stats-bar" id="stats-bar"></div>
+
+  <!-- FILTERS -->
+  <div class="filter-bar" id="filter-bar"></div>
+
+  <!-- TIMELINE -->
+  <div class="timeline-container" id="timeline"></div>
+
+  <!-- MODAL -->
+  <div class="modal-overlay" id="modal-overlay">
+    <div class="modal" style="position:relative;">
+      <button class="modal-close" id="modal-close">×</button>
+      <img class="modal-img" id="modal-img" src="" alt="">
+      <div class="modal-img-credit" id="modal-img-credit"></div>
+      <div class="modal-body" id="modal-body"></div>
+    </div>
+  </div>
+
+<script>
+// === TRAIN IMAGES (Wikimedia Commons — freely licensed) ===
+const TRAIN_IMAGES = {
+  'IC':   { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/FFS_RABDe_500_Olten.jpg/640px-FFS_RABDe_500_Olten.jpg', credit: 'SBB RABDe 500 ICN — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:FFS_RABDe_500_Olten.jpg' },
+  'IC21': { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/FFS_RABDe_500_Olten.jpg/640px-FFS_RABDe_500_Olten.jpg', credit: 'SBB RABDe 500 ICN — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:FFS_RABDe_500_Olten.jpg' },
+  'EC':   { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/SBB_Re_420_Erstfeld.jpg/640px-SBB_Re_420_Erstfeld.jpg', credit: 'EuroCity SBB — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_Re_420_Erstfeld.jpg' },
+  'IR':   { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/SBB_Giruno_bei_Muri_AG.jpg/640px-SBB_Giruno_bei_Muri_AG.jpg', credit: 'SBB Giruno IR — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_Giruno_bei_Muri_AG.jpg' },
+  'IR15': { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/SBB_RABe_502_Twinsdexx_bei_Fribourg.jpg/640px-SBB_RABe_502_Twinsdexx_bei_Fribourg.jpg', credit: 'SBB RABe 502 Twindexx IR15 — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_RABe_502_Twinsdexx_bei_Fribourg.jpg' },
+  'IR26': { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/SBB_Giruno_bei_Muri_AG.jpg/640px-SBB_Giruno_bei_Muri_AG.jpg', credit: 'SBB Giruno IR26 — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_Giruno_bei_Muri_AG.jpg' },
+  'IR27': { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/SBB_RABe_502_Twinsdexx_bei_Fribourg.jpg/640px-SBB_RABe_502_Twinsdexx_bei_Fribourg.jpg', credit: 'SBB RABe 502 Twindexx IR27 — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_RABe_502_Twinsdexx_bei_Fribourg.jpg' },
+  'IR70': { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/SBB_Giruno_bei_Muri_AG.jpg/640px-SBB_Giruno_bei_Muri_AG.jpg', credit: 'SBB Giruno IR70 — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_Giruno_bei_Muri_AG.jpg' },
+  'IR75': { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/SBB_RABe_502_Twinsdexx_bei_Fribourg.jpg/640px-SBB_RABe_502_Twinsdexx_bei_Fribourg.jpg', credit: 'SBB RABe 502 Twindexx IR75 — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_RABe_502_Twinsdexx_bei_Fribourg.jpg' },
+  'RE7':  { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/BLS_RABe_515_%22Mutz%22%2C_Spiez.jpg/640px-BLS_RABe_515_%22Mutz%22%2C_Spiez.jpg', credit: 'BLS RABe 515 "Mutz" RE7 — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:BLS_RABe_515_%22Mutz%22,_Spiez.jpg' },
+  'RE24': { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/BLS_RABe_515_%22Mutz%22%2C_Spiez.jpg/640px-BLS_RABe_515_%22Mutz%22%2C_Spiez.jpg', credit: 'BLS RABe 515 "Mutz" RE24 — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:BLS_RABe_515_%22Mutz%22,_Spiez.jpg' },
+  'S1':   { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/SBB_RABe_520_GTW_Luzern_S-Bahn.jpg/640px-SBB_RABe_520_GTW_Luzern_S-Bahn.jpg', credit: 'SBB RABe 520 GTW S-Bahn Luzern — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_RABe_520_GTW_Luzern_S-Bahn.jpg' },
+  'S6':   { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/SBB_RABe_520_GTW_Luzern_S-Bahn.jpg/640px-SBB_RABe_520_GTW_Luzern_S-Bahn.jpg', credit: 'SBB RABe 520 GTW S-Bahn Luzern — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_RABe_520_GTW_Luzern_S-Bahn.jpg' },
+  'S9':   { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/SBB_RABe_520_GTW_Luzern_S-Bahn.jpg/640px-SBB_RABe_520_GTW_Luzern_S-Bahn.jpg', credit: 'SBB RABe 520 GTW S-Bahn Luzern — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_RABe_520_GTW_Luzern_S-Bahn.jpg' },
+  'S77':  { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/SBB_RABe_520_GTW_Luzern_S-Bahn.jpg/640px-SBB_RABe_520_GTW_Luzern_S-Bahn.jpg', credit: 'SBB RABe 520 GTW S-Bahn Luzern — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_RABe_520_GTW_Luzern_S-Bahn.jpg' },
+  'S99':  { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/SBB_RABe_520_GTW_Luzern_S-Bahn.jpg/640px-SBB_RABe_520_GTW_Luzern_S-Bahn.jpg', credit: 'SBB RABe 520 GTW S-Bahn Luzern — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_RABe_520_GTW_Luzern_S-Bahn.jpg' },
+};
+
+const FALLBACK_IMG = 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/SBB_RABe_520_GTW_Luzern_S-Bahn.jpg/640px-SBB_RABe_520_GTW_Luzern_S-Bahn.jpg';
+
+function getTrainImage(line) {
+  return TRAIN_IMAGES[line] || { url: FALLBACK_IMG, credit: 'Wikimedia Commons', creditUrl: '#' };
+}
+
+function getCatClass(line) {
+  return 'cat-' + line.toLowerCase().replace(/\s+/g, '');
+}
+
+// === CSV DATA (embedded) ===
+const CSV_DATA = `richtung,zeit_punkt,zeit,linie,von,nach
+an,00:00:00,24:05:00,IC,Basel SBB,Luzern
+an,00:02:00,24:07:00,S1,Baar,Luzern
+an,00:05:00,24:10:00,RE7,Wolhusen,Luzern
+ab,00:10:00,24:05:00,RE24,Luzern,Olten
+ab,00:15:00,24:10:00,S9,Luzern,Beinwil am See
+an,00:20:00,24:25:00,IR75,Zürich HB,Luzern
+ab,00:21:00,24:16:00,S6,Luzern,Wolhusen
+an,00:23:00,24:28:00,S9,Hochdorf,Luzern
+an,00:33:00,24:38:00,S1,Baar,Luzern
+ab,00:35:00,24:30:00,S1,Luzern,Sursee
+an,00:50:00,24:55:00,RE24,Olten,Luzern
+an,00:56:00,25:01:00,S9,Lenzburg,Luzern
+an,01:02:00,25:07:00,IR70,Zürich HB,Luzern
+an,01:11:00,25:16:00,IR26,Basel SBB,Luzern
+an,01:32:00,25:37:00,S1,Sursee,Luzern
+ab,04:26:00,04:21:00,S1,Luzern,Sursee
+ab,04:55:00,04:50:00,RE7,Luzern,Bern
+ab,04:57:00,04:52:00,IR,Luzern,Zürich HB
+ab,04:59:00,04:54:00,IR26,Luzern,Basel SBB
+ab,05:10:00,05:05:00,RE24,Luzern,Olten
+an,05:22:00,05:27:00,S1,Sursee,Luzern
+an,05:23:00,05:28:00,S9,Lenzburg,Luzern
+ab,05:26:00,05:21:00,S1,Luzern,Baar
+an,05:33:00,05:38:00,IR26,Basel SBB,Erstfeld
+ab,05:37:00,05:32:00,S9,Luzern,Lenzburg
+an,05:38:00,05:43:00,S6,Wolhusen,Luzern
+ab,05:40:00,05:35:00,IR75,Luzern,Zürich HB
+ab,05:42:00,05:37:00,S77,Luzern,Willisau
+an,05:50:00,05:55:00,RE24,Olten,Luzern
+an,05:53:00,05:58:00,S9,Lenzburg,Luzern
+an,05:56:00,06:01:00,IR15,Genève Aéroport,Luzern
+an,05:58:00,06:03:00,RE7,Wolhusen,Luzern
+ab,05:59:00,05:54:00,IC21,Lugano,Basel SBB
+an,06:00:00,06:05:00,EC,Basel SBB,Como S. Giovanni
+ab,06:02:00,05:57:00,RE7,Luzern,Wolhusen
+ab,06:05:00,06:00:00,IR15,Luzern,Genève Aéroport
+ab,06:07:00,06:02:00,S9,Luzern,Lenzburg
+ab,06:10:00,06:05:00,RE24,Luzern,Olten
+an,06:13:00,06:18:00,S77,Willisau,Luzern
+an,06:20:00,06:25:00,IR75,Konstanz,Luzern
+ab,06:21:00,06:16:00,S6,Luzern,Wolhusen
+an,06:23:00,06:28:00,S9,Lenzburg,Luzern
+an,06:25:00,06:30:00,IR27,Basel SBB,Luzern
+ab,06:26:00,06:21:00,S1,Luzern,Baar
+ab,06:28:00,06:23:00,S99,Luzern,Hochdorf
+ab,06:35:00,06:30:00,IR27,Luzern,Basel SBB
+ab,06:37:00,06:32:00,S9,Luzern,Lenzburg
+an,06:38:00,06:43:00,S6,Wolhusen,Luzern
+ab,06:40:00,06:35:00,IR75,Luzern,Konstanz
+ab,06:42:00,06:37:00,S77,Luzern,Willisau
+an,06:50:00,06:55:00,RE24,Olten,Luzern
+an,06:53:00,06:58:00,S9,Lenzburg,Luzern
+an,06:56:00,07:01:00,IR15,Genève Aéroport,Luzern
+an,06:58:00,07:03:00,RE7,Wolhusen,Luzern
+ab,06:59:00,06:54:00,IR26,Locarno,Basel SBB
+an,07:00:00,07:05:00,IR26,Basel SBB,Locarno
+ab,07:02:00,06:57:00,RE7,Luzern,Wolhusen
+an,07:02:00,07:07:00,S1,Baar,Luzern
+ab,07:05:00,07:00:00,IR15,Luzern,Genève Aéroport
+ab,07:07:00,07:02:00,S9,Luzern,Lenzburg
+ab,07:10:00,07:05:00,RE24,Luzern,Olten
+an,07:13:00,07:18:00,S77,Willisau,Luzern
+an,07:20:00,07:25:00,IR75,Konstanz,Luzern
+ab,07:21:00,07:16:00,S6,Luzern,Wolhusen
+an,07:23:00,07:28:00,S9,Lenzburg,Luzern
+an,07:25:00,07:30:00,IR27,Basel SBB,Luzern
+ab,07:26:00,07:21:00,S1,Luzern,Baar
+ab,07:28:00,07:23:00,S99,Luzern,Hochdorf
+an,07:32:00,07:37:00,S1,Baar,Luzern
+ab,07:35:00,07:30:00,IR27,Luzern,Basel SBB
+ab,07:37:00,07:32:00,S9,Luzern,Lenzburg
+an,07:38:00,07:43:00,S6,Wolhusen,Luzern
+ab,07:40:00,07:35:00,IR75,Luzern,Konstanz
+ab,07:42:00,07:37:00,S77,Luzern,Willisau
+an,07:50:00,07:55:00,RE24,Olten,Luzern
+an,07:53:00,07:58:00,S9,Lenzburg,Luzern
+an,07:56:00,08:01:00,IR15,Genève Aéroport,Luzern
+an,07:58:00,08:03:00,RE7,Wolhusen,Luzern
+ab,07:59:00,07:54:00,IC21,Lugano,Basel SBB
+an,08:00:00,08:05:00,IC21,Basel SBB,Lugano
+ab,08:02:00,07:57:00,RE7,Luzern,Wolhusen
+an,08:02:00,08:07:00,S1,Baar,Luzern
+ab,08:05:00,08:00:00,IR15,Luzern,Genève Aéroport
+ab,08:07:00,08:02:00,S9,Luzern,Lenzburg
+ab,08:10:00,08:05:00,RE24,Luzern,Olten
+an,08:13:00,08:18:00,S77,Willisau,Luzern
+an,08:20:00,08:25:00,IR75,Zürich HB,Luzern
+ab,08:21:00,08:16:00,S6,Luzern,Wolhusen
+an,08:23:00,08:28:00,S9,Lenzburg,Luzern
+an,08:25:00,08:30:00,IR27,Basel SBB,Luzern
+ab,08:26:00,08:21:00,S1,Luzern,Baar
+ab,08:28:00,08:23:00,S99,Luzern,Hochdorf
+ab,08:35:00,08:30:00,IR27,Luzern,Basel SBB
+ab,08:37:00,08:32:00,S9,Luzern,Lenzburg
+an,08:38:00,08:43:00,S6,Wolhusen,Luzern
+ab,08:40:00,08:35:00,IR75,Luzern,Zürich HB
+ab,08:42:00,08:37:00,S77,Luzern,Willisau
+an,08:50:00,08:55:00,RE24,Olten,Luzern
+an,08:53:00,08:58:00,S9,Lenzburg,Luzern
+an,08:56:00,09:01:00,IR15,Genève Aéroport,Luzern
+an,08:58:00,09:03:00,RE7,Wolhusen,Luzern
+ab,08:59:00,08:54:00,IR26,Locarno,Basel SBB
+an,09:00:00,09:05:00,IR26,Basel SBB,Locarno
+ab,09:02:00,08:57:00,RE7,Luzern,Wolhusen
+ab,09:05:00,09:00:00,IR15,Luzern,Genève Aéroport
+ab,09:07:00,09:02:00,S9,Luzern,Lenzburg
+ab,09:10:00,09:05:00,RE24,Luzern,Olten
+an,09:20:00,09:25:00,IR75,Konstanz,Luzern
+ab,09:21:00,09:16:00,S6,Luzern,Wolhusen
+an,09:23:00,09:28:00,S9,Lenzburg,Luzern
+an,09:25:00,09:30:00,IR27,Basel SBB,Luzern
+ab,09:35:00,09:30:00,IR27,Luzern,Basel SBB
+ab,09:37:00,09:32:00,S9,Luzern,Lenzburg
+an,09:38:00,09:43:00,S6,Wolhusen,Luzern
+ab,09:40:00,09:35:00,IR75,Luzern,Konstanz
+an,09:50:00,09:55:00,RE24,Olten,Luzern
+an,09:53:00,09:58:00,S9,Lenzburg,Luzern
+an,09:56:00,10:01:00,IR15,Genève Aéroport,Luzern
+an,09:58:00,10:03:00,RE7,Wolhusen,Luzern
+ab,09:59:00,09:54:00,IC21,Lugano,Basel SBB
+an,10:00:00,10:05:00,IC21,Basel SBB,Lugano
+ab,10:02:00,09:57:00,RE7,Luzern,Wolhusen
+ab,10:05:00,10:00:00,IR15,Luzern,Genève Aéroport
+ab,10:07:00,10:02:00,S9,Luzern,Lenzburg
+ab,10:10:00,10:05:00,RE24,Luzern,Olten
+an,10:20:00,10:25:00,IR75,Konstanz,Luzern
+ab,10:21:00,10:16:00,S6,Luzern,Wolhusen
+an,10:23:00,10:28:00,S9,Lenzburg,Luzern
+an,10:25:00,10:30:00,IR27,Basel SBB,Luzern
+ab,10:35:00,10:30:00,IR27,Luzern,Basel SBB
+ab,10:37:00,10:32:00,S9,Luzern,Lenzburg
+an,10:38:00,10:43:00,S6,Wolhusen,Luzern
+ab,10:40:00,10:35:00,IR75,Luzern,Konstanz
+an,10:50:00,10:55:00,RE24,Olten,Luzern
+an,10:53:00,10:58:00,S9,Lenzburg,Luzern
+an,10:56:00,11:01:00,IR15,Genève Aéroport,Luzern
+an,10:58:00,11:03:00,RE7,Wolhusen,Luzern
+ab,10:59:00,10:54:00,IR26,Locarno,Basel SBB
+an,11:00:00,11:05:00,IR26,Basel SBB,Locarno
+ab,11:02:00,10:57:00,RE7,Luzern,Wolhusen
+ab,11:05:00,11:00:00,IR15,Luzern,Genève Aéroport
+ab,11:07:00,11:02:00,S9,Luzern,Lenzburg
+ab,11:10:00,11:05:00,RE24,Luzern,Olten
+an,11:20:00,11:25:00,IR75,Konstanz,Luzern
+ab,11:21:00,11:16:00,S6,Luzern,Wolhusen
+an,11:23:00,11:28:00,S9,Lenzburg,Luzern
+an,11:25:00,11:30:00,IR27,Basel SBB,Luzern
+ab,11:35:00,11:30:00,IR27,Luzern,Basel SBB
+ab,11:37:00,11:32:00,S9,Luzern,Lenzburg
+an,11:38:00,11:43:00,S6,Wolhusen,Luzern
+ab,11:40:00,11:35:00,IR75,Luzern,Konstanz
+an,11:50:00,11:55:00,RE24,Olten,Luzern
+an,11:53:00,11:58:00,S9,Lenzburg,Luzern
+an,11:56:00,12:01:00,IR15,Genève Aéroport,Luzern
+an,11:58:00,12:03:00,RE7,Wolhusen,Luzern
+ab,11:59:00,11:54:00,IC21,Lugano,Basel SBB
+an,12:00:00,12:05:00,IC21,Basel SBB,Lugano
+ab,12:02:00,11:57:00,RE7,Luzern,Wolhusen
+ab,12:05:00,12:00:00,IR15,Luzern,Genève Aéroport
+ab,12:07:00,12:02:00,S9,Luzern,Lenzburg
+ab,12:10:00,12:05:00,RE24,Luzern,Olten
+an,12:20:00,12:25:00,IR75,Konstanz,Luzern
+ab,12:21:00,12:16:00,S6,Luzern,Wolhusen
+an,12:23:00,12:28:00,S9,Lenzburg,Luzern
+an,12:25:00,12:30:00,IR27,Basel SBB,Luzern
+ab,12:35:00,12:30:00,IR27,Luzern,Basel SBB
+ab,12:37:00,12:32:00,S9,Luzern,Lenzburg
+an,12:38:00,12:43:00,S6,Wolhusen,Luzern
+ab,12:40:00,12:35:00,IR75,Luzern,Konstanz
+an,12:50:00,12:55:00,RE24,Olten,Luzern
+an,12:53:00,12:58:00,S9,Lenzburg,Luzern
+an,12:56:00,13:01:00,IR15,Genève Aéroport,Luzern
+an,12:58:00,13:03:00,RE7,Wolhusen,Luzern
+ab,12:59:00,12:54:00,IR26,Locarno,Basel SBB
+an,13:00:00,13:05:00,IR26,Basel SBB,Locarno
+ab,13:02:00,12:57:00,RE7,Luzern,Wolhusen
+ab,13:05:00,13:00:00,IR15,Luzern,Genève Aéroport
+ab,13:07:00,13:02:00,S9,Luzern,Lenzburg
+ab,13:10:00,13:05:00,RE24,Luzern,Olten
+an,13:20:00,13:25:00,IR75,Konstanz,Luzern
+ab,13:21:00,13:16:00,S6,Luzern,Wolhusen
+an,13:25:00,13:30:00,IR27,Basel SBB,Luzern
+ab,13:35:00,13:30:00,IR27,Luzern,Basel SBB
+an,13:38:00,13:43:00,S6,Wolhusen,Luzern
+ab,13:40:00,13:35:00,IR75,Luzern,Konstanz
+an,13:53:00,13:58:00,RE24,Olten,Luzern
+an,13:56:00,14:01:00,IR15,Genève Aéroport,Luzern
+an,13:58:00,14:03:00,RE7,Wolhusen,Luzern
+ab,13:59:00,13:54:00,EC,Como S. Giovanni,Basel SBB
+an,14:00:00,14:05:00,IC21,Basel SBB,Lugano
+ab,14:02:00,13:57:00,RE7,Luzern,Wolhusen
+ab,14:05:00,14:00:00,IR15,Luzern,Genève Aéroport
+ab,14:10:00,14:05:00,RE24,Luzern,Olten
+an,14:20:00,14:25:00,IR75,Konstanz,Luzern
+ab,14:21:00,14:16:00,S6,Luzern,Wolhusen
+an,14:25:00,14:30:00,IR27,Basel SBB,Luzern
+ab,14:35:00,14:30:00,IR27,Luzern,Basel SBB
+an,14:38:00,14:43:00,S6,Wolhusen,Luzern
+ab,14:40:00,14:35:00,IR75,Luzern,Konstanz
+an,14:53:00,14:58:00,RE24,Olten,Luzern
+an,14:56:00,15:01:00,IR15,Genève Aéroport,Luzern
+an,14:58:00,15:03:00,RE7,Wolhusen,Luzern
+ab,14:59:00,14:54:00,IR26,Locarno,Basel SBB
+an,15:00:00,15:05:00,IR26,Basel SBB,Locarno
+ab,15:02:00,14:57:00,RE7,Luzern,Wolhusen
+ab,15:05:00,15:00:00,IR15,Luzern,Genève Aéroport
+ab,15:10:00,15:05:00,RE24,Luzern,Olten
+an,15:20:00,15:25:00,IR75,Konstanz,Luzern
+ab,15:21:00,15:16:00,S6,Luzern,Wolhusen
+an,15:25:00,15:30:00,IR27,Basel SBB,Luzern
+ab,15:35:00,15:30:00,IR27,Luzern,Basel SBB
+an,15:38:00,15:43:00,S6,Wolhusen,Luzern
+ab,15:40:00,15:35:00,IR75,Luzern,Konstanz
+ab,15:42:00,15:37:00,S77,Luzern,Willisau
+an,15:53:00,15:58:00,RE24,Olten,Luzern
+an,15:56:00,16:01:00,IR15,Genève Aéroport,Luzern
+an,15:58:00,16:03:00,RE7,Wolhusen,Luzern
+ab,15:59:00,15:54:00,IC21,Lugano,Basel SBB
+an,16:00:00,16:05:00,EC,Basel SBB,Como S. Giovanni
+ab,16:02:00,15:57:00,RE7,Luzern,Wolhusen
+ab,16:05:00,16:00:00,IR15,Luzern,Genève Aéroport
+ab,16:10:00,16:05:00,RE24,Luzern,Olten
+an,16:13:00,16:18:00,S77,Willisau,Luzern
+an,16:20:00,16:25:00,IR75,Zürich HB,Luzern
+ab,16:21:00,16:16:00,S6,Luzern,Wolhusen
+an,16:25:00,16:30:00,IR27,Basel SBB,Luzern
+ab,16:28:00,16:23:00,S99,Luzern,Hochdorf
+ab,16:35:00,16:30:00,IR27,Luzern,Basel SBB
+ab,16:37:00,16:32:00,S9,Luzern,Lenzburg
+an,16:38:00,16:43:00,S6,Wolhusen,Luzern
+ab,16:40:00,16:35:00,IR75,Luzern,Zürich HB
+ab,16:42:00,16:37:00,S77,Luzern,Willisau
+an,16:53:00,16:58:00,RE24,Olten,Luzern
+an,16:56:00,17:01:00,IR15,Genève Aéroport,Luzern
+an,16:58:00,17:03:00,RE7,Wolhusen,Luzern
+ab,16:59:00,16:54:00,IR26,Locarno,Basel SBB
+an,17:00:00,17:05:00,IR26,Basel SBB,Locarno
+ab,17:02:00,16:57:00,RE7,Luzern,Wolhusen
+ab,17:05:00,17:00:00,IR15,Luzern,Genève Aéroport
+ab,17:07:00,17:02:00,S9,Luzern,Lenzburg
+ab,17:10:00,17:05:00,RE24,Luzern,Olten
+an,17:13:00,17:18:00,S77,Willisau,Luzern
+an,17:20:00,17:25:00,IR75,Konstanz,Luzern
+ab,17:21:00,17:16:00,S6,Luzern,Wolhusen
+an,17:23:00,17:28:00,S9,Hochdorf,Luzern
+an,17:25:00,17:30:00,IR27,Basel SBB,Luzern
+ab,17:28:00,17:23:00,S99,Luzern,Hochdorf
+an,17:34:00,17:39:00,IR,Zürich HB,Luzern
+ab,17:35:00,17:30:00,IR27,Luzern,Basel SBB
+ab,17:37:00,17:32:00,S9,Luzern,Lenzburg
+an,17:38:00,17:43:00,S6,Wolhusen,Luzern
+ab,17:40:00,17:35:00,IR75,Luzern,Konstanz
+ab,17:42:00,17:37:00,S77,Luzern,Willisau
+an,17:50:00,17:55:00,RE24,Olten,Luzern
+an,17:53:00,17:58:00,S9,Lenzburg,Luzern
+an,17:56:00,18:01:00,IR15,Genève Aéroport,Luzern
+an,17:58:00,18:03:00,RE7,Wolhusen,Luzern
+ab,17:59:00,17:54:00,IC21,Lugano,Basel SBB
+an,18:00:00,18:05:00,IC21,Basel SBB,Lugano
+ab,18:02:00,17:57:00,RE7,Luzern,Wolhusen
+ab,18:05:00,18:00:00,IR15,Luzern,Genève Aéroport
+ab,18:07:00,18:02:00,S9,Luzern,Lenzburg
+ab,18:10:00,18:05:00,RE24,Luzern,Olten
+an,18:13:00,18:18:00,S77,Willisau,Luzern
+an,18:20:00,18:25:00,IR75,Zürich HB,Luzern
+ab,18:21:00,18:16:00,S6,Luzern,Wolhusen
+an,18:23:00,18:28:00,S9,Lenzburg,Luzern
+an,18:25:00,18:30:00,IR27,Basel SBB,Luzern
+ab,18:28:00,18:23:00,S99,Luzern,Hochdorf
+an,18:34:00,18:39:00,IR,Zürich HB,Luzern
+ab,18:35:00,18:30:00,IR27,Luzern,Basel SBB
+ab,18:37:00,18:32:00,S9,Luzern,Lenzburg
+an,18:38:00,18:43:00,S6,Wolhusen,Luzern
+ab,18:40:00,18:35:00,IR75,Luzern,Konstanz
+ab,18:42:00,18:37:00,S77,Luzern,Willisau
+an,18:50:00,18:55:00,RE24,Olten,Luzern
+an,18:53:00,18:58:00,S9,Lenzburg,Luzern
+an,18:56:00,19:01:00,IR15,Genève Aéroport,Luzern
+an,18:58:00,19:03:00,RE7,Wolhusen,Luzern
+ab,18:59:00,18:54:00,IR26,Locarno,Basel SBB
+an,19:00:00,19:05:00,IR26,Basel SBB,Bellinzona
+ab,19:02:00,18:57:00,RE7,Luzern,Wolhusen
+ab,19:05:00,19:00:00,IR15,Luzern,Lausanne
+ab,19:07:00,19:02:00,S9,Luzern,Lenzburg
+ab,19:10:00,19:05:00,RE24,Luzern,Olten
+an,19:13:00,19:18:00,S77,Willisau,Luzern
+an,19:20:00,19:25:00,IR75,Konstanz,Luzern
+ab,19:21:00,19:16:00,S6,Luzern,Wolhusen
+an,19:23:00,19:28:00,S9,Lenzburg,Luzern
+an,19:25:00,19:30:00,IR27,Basel SBB,Luzern
+ab,19:35:00,19:30:00,IR27,Luzern,Basel SBB
+ab,19:37:00,19:32:00,S9,Luzern,Lenzburg
+an,19:38:00,19:43:00,S6,Wolhusen,Luzern
+ab,19:40:00,19:35:00,IR75,Luzern,Konstanz
+ab,19:42:00,19:37:00,S77,Luzern,Willisau
+an,19:50:00,19:55:00,RE24,Olten,Luzern
+an,19:53:00,19:58:00,S9,Lenzburg,Luzern
+an,19:56:00,20:01:00,IR15,Genève Aéroport,Luzern
+an,19:58:00,20:03:00,RE7,Wolhusen,Luzern
+ab,19:59:00,19:54:00,IC21,Lugano,Basel SBB
+an,20:00:00,20:05:00,IC21,Basel SBB,Chiasso
+ab,20:02:00,19:57:00,RE7,Luzern,Wolhusen
+ab,20:05:00,20:00:00,IR15,Luzern,Lausanne
+ab,20:07:00,20:02:00,S9,Luzern,Lenzburg
+ab,20:10:00,20:05:00,RE24,Luzern,Olten
+an,20:20:00,20:25:00,IR75,Konstanz,Luzern
+ab,20:21:00,20:16:00,S6,Luzern,Wolhusen
+an,20:23:00,20:28:00,S9,Lenzburg,Luzern
+an,20:25:00,20:30:00,IR27,Basel SBB,Luzern
+ab,20:35:00,20:30:00,IR27,Luzern,Basel SBB
+ab,20:37:00,20:32:00,S9,Luzern,Lenzburg
+an,20:38:00,20:43:00,S6,Wolhusen,Luzern
+ab,20:40:00,20:35:00,IR75,Luzern,Zürich HB
+an,20:50:00,20:55:00,RE24,Olten,Luzern
+an,20:53:00,20:58:00,S9,Lenzburg,Luzern
+an,20:56:00,21:01:00,IR15,Genève Aéroport,Luzern
+an,20:58:00,21:03:00,RE7,Wolhusen,Luzern
+ab,20:59:00,20:54:00,IR26,Locarno,Olten
+an,21:00:00,21:05:00,IR26,Basel SBB,Erstfeld
+ab,21:02:00,20:57:00,RE7,Luzern,Bern
+ab,21:05:00,21:00:00,IR15,Luzern,Lausanne
+ab,21:07:00,21:02:00,S9,Luzern,Lenzburg
+ab,21:10:00,21:05:00,RE24,Luzern,Olten
+an,21:20:00,21:25:00,IR75,Konstanz,Luzern
+ab,21:21:00,21:16:00,S6,Luzern,Wolhusen
+an,21:23:00,21:28:00,S9,Lenzburg,Luzern
+an,21:25:00,21:30:00,IR27,Basel SBB,Luzern
+ab,21:37:00,21:32:00,S9,Luzern,Hochdorf
+an,21:38:00,21:43:00,S6,Wolhusen,Luzern
+ab,21:40:00,21:35:00,IR75,Luzern,Zürich HB
+an,21:50:00,21:55:00,RE24,Olten,Luzern
+an,21:53:00,21:58:00,S9,Lenzburg,Luzern
+an,21:56:00,22:01:00,IR15,Genève Aéroport,Luzern
+an,21:58:00,22:03:00,RE7,Wolhusen,Luzern
+ab,21:59:00,21:54:00,IC21,Lugano,Basel SBB
+an,22:00:00,22:05:00,IC21,Basel SBB,Chiasso
+ab,22:02:00,21:57:00,RE7,Luzern,Bern
+ab,22:05:00,22:00:00,IR15,Luzern,Lausanne
+ab,22:07:00,22:02:00,S9,Luzern,Lenzburg
+ab,22:10:00,22:05:00,RE24,Luzern,Olten
+an,22:20:00,22:25:00,IR75,Zürich HB,Luzern
+ab,22:21:00,22:16:00,S6,Luzern,Wolhusen
+an,22:23:00,22:28:00,S9,Hochdorf,Luzern
+an,22:25:00,22:30:00,IR27,Basel SBB,Luzern
+ab,22:37:00,22:32:00,S9,Luzern,Hochdorf
+an,22:38:00,22:43:00,S6,Wolhusen,Luzern
+ab,22:40:00,22:35:00,IR75,Luzern,Zürich HB
+an,22:50:00,22:55:00,RE24,Olten,Luzern
+an,22:53:00,22:58:00,S9,Lenzburg,Luzern
+an,22:56:00,23:01:00,IR15,Genève Aéroport,Luzern
+an,22:58:00,23:03:00,RE7,Wolhusen,Luzern
+ab,22:59:00,22:54:00,IR26,Locarno,Basel SBB
+an,23:00:00,23:05:00,IR26,Olten,Arth-Goldau
+ab,23:02:00,22:57:00,RE7,Luzern,Langnau i.E.
+ab,23:05:00,23:00:00,IR15,Luzern,Fribourg/Freiburg
+ab,23:07:00,23:02:00,S9,Luzern,Lenzburg
+ab,23:10:00,23:05:00,RE24,Luzern,Olten
+an,23:20:00,23:25:00,IR75,Zürich HB,Luzern
+ab,23:21:00,23:16:00,S6,Luzern,Wolhusen
+an,23:23:00,23:28:00,S9,Hochdorf,Luzern
+ab,23:37:00,23:32:00,S9,Luzern,Hochdorf
+an,23:38:00,23:43:00,S6,Wolhusen,Luzern
+ab,23:40:00,23:35:00,IR75,Luzern,Zürich HB
+an,23:50:00,23:55:00,RE24,Olten,Luzern
+an,23:53:00,23:58:00,S9,Lenzburg,Luzern
+an,23:56:00,24:01:00,IR15,Lausanne,Luzern
+ab,23:59:00,23:54:00,IC21,Lugano,Basel SBB`;
+
+// === PARSE CSV ===
+function parseCSV(csv) {
+  const lines = csv.trim().split('\n');
+  const headers = lines[0].split(',');
+  return lines.slice(1).map(line => {
+    const vals = line.split(',');
+    const obj = {};
+    headers.forEach((h, i) => obj[h.trim()] = (vals[i] || '').trim());
+    return obj;
+  });
+}
+
+// === RENDER ===
+let allTrains = [];
+let activeLines = new Set();
+let activeDir = null; // null = both
+
+function init() {
+  allTrains = parseCSV(CSV_DATA);
+
+  // Collect unique lines
+  const lines = [...new Set(allTrains.map(t => t.linie))].sort((a,b) => {
+    const order = { IC:0, IC21:1, EC:2, IR:3, IR15:4, IR26:5, IR27:6, IR70:7, IR75:8, RE7:9, RE24:10, S1:11, S6:12, S9:13, S77:14, S99:15 };
+    return (order[a] ?? 99) - (order[b] ?? 99);
+  });
+
+  renderStats();
+  renderFilters(lines);
+  renderTimeline();
+}
+
+function renderStats() {
+  const arrivals = allTrains.filter(t => t.richtung === 'an').length;
+  const departures = allTrains.filter(t => t.richtung === 'ab').length;
+  const lines = new Set(allTrains.map(t => t.linie)).size;
+
+  // First & last train
+  const times = allTrains.map(t => t.zeit_punkt).sort();
+  const first = times[0]?.substring(0,5) || '--:--';
+
+  // Find the last "real" train (excluding 00:xx which are after midnight)
+  const realTimes = allTrains.map(t => t.zeit_punkt).filter(t => !t.startsWith('00:')).sort();
+  const last = realTimes[realTimes.length - 1]?.substring(0,5) || times[times.length-1]?.substring(0,5) || '--:--';
+
+  document.getElementById('stats-bar').innerHTML = `
+    <div class="stat"><div class="stat-value">${allTrains.length}</div><div class="stat-label">Züge pro Tag</div></div>
+    <div class="stat"><div class="stat-value" style="color:var(--arrival)">${arrivals}</div><div class="stat-label">Ankünfte</div></div>
+    <div class="stat"><div class="stat-value" style="color:var(--departure)">${departures}</div><div class="stat-label">Abfahrten</div></div>
+    <div class="stat"><div class="stat-value">${lines}</div><div class="stat-label">Linien</div></div>
+    <div class="stat"><div class="stat-value">${first}</div><div class="stat-label">Erster Zug</div></div>
+    <div class="stat"><div class="stat-value">${last}</div><div class="stat-label">Letzter Zug</div></div>
+  `;
+}
+
+function renderFilters(lines) {
+  let html = '';
+
+  // Direction filters
+  html += `<button class="filter-btn dir-btn dir-an active" data-dir="an">↓ Ankünfte</button>`;
+  html += `<button class="filter-btn dir-btn dir-ab active" data-dir="ab">↑ Abfahrten</button>`;
+  html += `<div class="filter-divider"></div>`;
+
+  // Line filters
+  lines.forEach(line => {
+    html += `<button class="filter-btn line-btn" data-line="${line}">${line}</button>`;
+  });
+
+  document.getElementById('filter-bar').innerHTML = html;
+
+  // Direction click handlers
+  document.querySelectorAll('.dir-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.classList.toggle('active');
+      updateFilter();
+    });
+  });
+
+  // Line click handlers
+  document.querySelectorAll('.line-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      btn.classList.toggle('active');
+      if (btn.classList.contains('active')) {
+        activeLines.add(btn.dataset.line);
+      } else {
+        activeLines.delete(btn.dataset.line);
+      }
+      renderTimeline();
+    });
+  });
+}
+
+function updateFilter() {
+  renderTimeline();
+}
+
+function getFilteredTrains() {
+  let filtered = allTrains;
+
+  // Direction filter
+  const anActive = document.querySelector('.dir-btn.dir-an')?.classList.contains('active');
+  const abActive = document.querySelector('.dir-btn.dir-ab')?.classList.contains('active');
+
+  if (anActive && !abActive) filtered = filtered.filter(t => t.richtung === 'an');
+  else if (!anActive && abActive) filtered = filtered.filter(t => t.richtung === 'ab');
+  else if (!anActive && !abActive) filtered = [];
+
+  // Line filter
+  if (activeLines.size > 0) {
+    filtered = filtered.filter(t => activeLines.has(t.linie));
+  }
+
+  return filtered;
+}
+
+function renderTimeline() {
+  const trains = getFilteredTrains();
+
+  // Group by hour
+  const hourGroups = {};
+  trains.forEach(t => {
+    const hour = t.zeit_punkt.substring(0, 2);
+    if (!hourGroups[hour]) hourGroups[hour] = [];
+    hourGroups[hour].push(t);
+  });
+
+  const sortedHours = Object.keys(hourGroups).sort();
+
+  let html = '';
+  sortedHours.forEach(hour => {
+    const group = hourGroups[hour];
+
+    html += `<div class="hour-group">`;
+    html += `<div class="hour-header">`;
+    html += `<span class="hour-time">${hour}:00</span>`;
+    html += `<span class="hour-line"></span>`;
+    html += `<span class="hour-count">${group.length} Züge</span>`;
+    html += `</div>`;
+    html += `<div class="train-grid">`;
+
+    group.forEach((t, i) => {
+      const catClass = getCatClass(t.linie);
+      const timeShort = t.zeit_punkt.substring(0, 5);
+      const luzernTime = t.zeit.substring(0, 5);
+      const dirClass = t.richtung === 'an' ? 'time-an' : 'time-ab';
+      const dirLabel = t.richtung === 'an' ? 'ankunft' : 'abfahrt';
+      const dirLabelClass = t.richtung === 'an' ? 'dir-an' : 'dir-ab';
+      const img = getTrainImage(t.linie);
+      const delay = Math.min(i * 40, 300);
+
+      const luzernLabel = t.richtung === 'an'
+        ? `Luzern an ${luzernTime}`
+        : `Luzern ab ${luzernTime}`;
+
+      html += `
+        <div class="train-card" style="animation-delay: ${delay}ms" onclick="openModal(${JSON.stringify(t).replace(/"/g,'&quot;')})">
+          <div class="card-accent ${catClass}"></div>
+          <div class="card-body">
+            <div class="card-time-block">
+              <div class="card-time ${dirClass}">${timeShort}</div>
+              <div class="card-dir-label ${dirLabelClass}">${dirLabel}</div>
+            </div>
+            <div class="card-info">
+              <div class="card-line-row">
+                <span class="line-badge ${catClass}">${t.linie}</span>
+              </div>
+              <div class="card-route">${t.von} <span class="card-route-arrow">→</span> ${t.nach}</div>
+              <div class="card-luzern-time">${luzernLabel}</div>
+            </div>
+          </div>
+          <img class="card-img" src="${img.url}" alt="${t.linie}" loading="lazy" onerror="this.style.display='none'">
+        </div>
+      `;
+    });
+
+    html += `</div></div>`;
+  });
+
+  if (trains.length === 0) {
+    html = `<div style="text-align:center; padding:60px; color:var(--text-muted);">
+      <p style="font-size:1.2rem; margin-bottom:8px;">Keine Züge gefunden</p>
+      <p>Passe die Filter oben an.</p>
+    </div>`;
+  }
+
+  document.getElementById('timeline').innerHTML = html;
+}
+
+// === MODAL ===
+function openModal(train) {
+  const img = getTrainImage(train.linie);
+  const catClass = getCatClass(train.linie);
+  const timeShort = train.zeit_punkt.substring(0, 5);
+  const luzernTime = train.zeit.substring(0, 5);
+  const dirClass = train.richtung === 'an' ? 'dir-an' : 'dir-ab';
+  const dirLabel = train.richtung === 'an' ? 'Ankunft' : 'Abfahrt';
+  const timeClass = train.richtung === 'an' ? 'time-an' : 'time-ab';
+
+  document.getElementById('modal-img').src = img.url;
+  document.getElementById('modal-img-credit').innerHTML = `Bild: <a href="${img.creditUrl}" target="_blank">${img.credit}</a>`;
+
+  const luzernLabel = train.richtung === 'an'
+    ? `Ankunft Luzern: ${luzernTime}`
+    : `Abfahrt Luzern: ${luzernTime}`;
+
+  // Calculate time difference
+  const punktParts = train.zeit_punkt.split(':').map(Number);
+  const zeitParts = train.zeit.split(':').map(Number);
+  const punktMin = punktParts[0] * 60 + punktParts[1];
+  let zeitMin = zeitParts[0] * 60 + zeitParts[1];
+  if (zeitMin >= 1440) zeitMin -= 1440; // Handle 24:xx times
+  const diff = Math.abs(punktMin - zeitMin);
+
+  document.getElementById('modal-body').innerHTML = `
+    <div class="modal-header">
+      <span class="line-badge modal-badge ${catClass}">${train.linie}</span>
+      <span class="modal-time ${timeClass}">${timeShort}</span>
+      <span class="modal-dir-badge ${dirClass}">${dirLabel}</span>
+    </div>
+    <div class="modal-detail">
+      <span class="modal-label">Durchfahrt Kreuzstutz</span>
+      <span class="modal-value" style="font-weight:700;">${timeShort}</span>
+      <span class="modal-label">${luzernLabel.split(':')[0]}</span>
+      <span class="modal-value">${luzernTime}</span>
+      <span class="modal-label">Differenz</span>
+      <span class="modal-value">${diff} min</span>
+      <span class="modal-label">Von</span>
+      <span class="modal-value">${train.von}</span>
+      <span class="modal-label">Nach</span>
+      <span class="modal-value">${train.nach}</span>
+      <span class="modal-label">Richtung</span>
+      <span class="modal-value">${train.richtung === 'an' ? '↓ Richtung Luzern' : '↑ Von Luzern weg'}</span>
+    </div>
+    <div class="modal-route-vis">
+      <span class="route-station">${train.von}</span>
+      <div class="route-line">
+        <div class="route-dot" style="left: ${train.richtung === 'an' ? '70%' : '30%'};" title="Kreuzstutz"></div>
+      </div>
+      <span class="route-station">${train.nach}</span>
+    </div>
+  `;
+
+  document.getElementById('modal-overlay').classList.add('active');
+}
+
+document.getElementById('modal-close').addEventListener('click', () => {
+  document.getElementById('modal-overlay').classList.remove('active');
+});
+document.getElementById('modal-overlay').addEventListener('click', (e) => {
+  if (e.target === e.currentTarget) {
+    document.getElementById('modal-overlay').classList.remove('active');
+  }
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === 'Escape') document.getElementById('modal-overlay').classList.remove('active');
+});
+
+// GO
+init();
+</script>
+</body>
+</html>
