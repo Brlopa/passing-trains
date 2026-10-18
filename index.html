@@ -476,6 +476,302 @@
     }
     .modal-img-credit a { color: var(--text-muted); text-decoration: underline; }
 
+    /* === HOURLY CHART PLOT === */
+    .chart-section {
+      max-width: 1200px;
+      margin: 0 auto 28px;
+      padding: 0 24px;
+    }
+
+    .chart-card {
+      background: var(--bg-card);
+      border: 1px solid var(--glass-border);
+      border-radius: 18px;
+      padding: 24px 28px 20px;
+      box-shadow: var(--shadow);
+      position: relative;
+    }
+
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 22px;
+    }
+
+    .chart-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      color: var(--accent-red);
+      background: rgba(224,60,49,0.08);
+      border: 1px solid rgba(224,60,49,0.18);
+      padding: 3px 10px;
+      border-radius: 100px;
+      margin-bottom: 8px;
+    }
+    .chart-badge svg { width: 12px; height: 12px; }
+
+    .chart-title {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: #fff;
+      letter-spacing: -0.01em;
+    }
+
+    .chart-subtitle {
+      font-size: 0.8rem;
+      color: var(--text-secondary);
+      margin-top: 3px;
+    }
+
+    .chart-legend {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      font-size: 0.78rem;
+      color: var(--text-secondary);
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-weight: 500;
+    }
+
+    .legend-chip {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      display: inline-block;
+    }
+    .legend-chip.chip-an { background: var(--arrival); box-shadow: 0 0 8px rgba(16,185,129,0.4); }
+    .legend-chip.chip-ab { background: var(--departure); box-shadow: 0 0 8px rgba(245,158,11,0.4); }
+
+    .legend-meta {
+      color: var(--text-muted);
+      font-size: 0.75rem;
+      border-left: 1px solid var(--glass-border);
+      padding-left: 14px;
+    }
+    .legend-meta strong { color: var(--text-primary); font-weight: 600; }
+
+    .chart-container {
+      position: relative;
+      height: 190px;
+      margin-top: 10px;
+      padding-bottom: 26px;
+    }
+
+    .chart-grid {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 26px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      pointer-events: none;
+    }
+
+    .chart-grid-line {
+      width: 100%;
+      height: 1px;
+      background: rgba(255,255,255,0.04);
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
+    .chart-grid-line span {
+      position: absolute;
+      right: 0;
+      transform: translateY(-50%);
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      font-variant-numeric: tabular-nums;
+      padding-left: 6px;
+      background: var(--bg-card);
+    }
+
+    .chart-bars {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-between;
+      height: 100%;
+      gap: 5px;
+    }
+
+    .chart-col {
+      flex: 1;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-end;
+      position: relative;
+      cursor: pointer;
+      min-width: 0;
+      padding-bottom: 26px;
+    }
+
+    .chart-col:hover .bar-track {
+      filter: brightness(1.25);
+      transform: scaleY(1.03);
+    }
+
+    .chart-col:hover .chart-hour-label {
+      color: var(--text-primary);
+      font-weight: 700;
+    }
+
+    .chart-col:hover .bar-count-tag {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .bar-count-tag {
+      position: absolute;
+      top: -24px;
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      background: rgba(255,255,255,0.12);
+      padding: 1px 5px;
+      border-radius: 4px;
+      opacity: 0;
+      transform: translateY(4px);
+      transition: all 0.15s ease;
+      pointer-events: none;
+      white-space: nowrap;
+      font-variant-numeric: tabular-nums;
+      z-index: 10;
+    }
+
+    .chart-col.is-peak .bar-count-tag {
+      opacity: 0.85;
+      transform: translateY(0);
+      background: rgba(224,60,49,0.2);
+      color: #ff8a80;
+      border: 1px solid rgba(224,60,49,0.3);
+    }
+
+    .bar-track {
+      width: 100%;
+      max-width: 32px;
+      border-radius: 5px 5px 2px 2px;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transform-origin: bottom;
+      transition: all 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      position: relative;
+    }
+
+    .bar-track.is-zero {
+      height: 2px !important;
+      background: rgba(255,255,255,0.06);
+      border-radius: 1px;
+      box-shadow: none;
+    }
+
+    .bar-seg {
+      width: 100%;
+      transition: height 0.3s ease;
+    }
+    .bar-seg.seg-an {
+      background: linear-gradient(180deg, #34d399 0%, #10b981 100%);
+    }
+    .bar-seg.seg-ab {
+      background: linear-gradient(180deg, #fbbf24 0%, #f59e0b 100%);
+    }
+
+    .chart-hour-label {
+      position: absolute;
+      bottom: 4px;
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      font-variant-numeric: tabular-nums;
+      transition: color 0.15s;
+      white-space: nowrap;
+    }
+
+    .chart-tooltip {
+      position: absolute;
+      bottom: calc(100% + 12px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: #181824;
+      border: 1px solid rgba(255,255,255,0.14);
+      border-radius: 10px;
+      padding: 10px 14px;
+      font-size: 0.75rem;
+      white-space: nowrap;
+      pointer-events: none;
+      z-index: 50;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.6);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.15s ease;
+    }
+
+    .chart-col:hover .chart-tooltip {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(-2px);
+    }
+
+    .tooltip-title {
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .tooltip-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-secondary);
+      margin: 2px 0;
+    }
+    .tooltip-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 2px;
+    }
+    .tooltip-hint {
+      font-size: 0.65rem;
+      color: var(--text-muted);
+      margin-top: 6px;
+      padding-top: 5px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .chart-footer-note {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-align: center;
+      margin-top: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+    }
+
     /* === RESPONSIVE === */
     @media (max-width: 768px) {
       .hero { padding: 40px 20px 30px; }
@@ -484,6 +780,12 @@
       .filter-bar { padding: 12px 16px; }
       .timeline-container { padding: 0 12px 40px; }
       .card-img { width: 80px; height: 60px; }
+      .chart-section { padding: 0 12px; }
+      .chart-card { padding: 18px 14px 14px; }
+      .chart-bars { gap: 2px; }
+      .bar-track { border-radius: 3px 3px 1px 1px; }
+      .chart-hour-label { font-size: 0.58rem; }
+      .chart-col:nth-child(2n) .chart-hour-label { display: none; }
     }
 
     /* === SCROLL ANIMATION === */
@@ -506,11 +808,32 @@
       Trackside Schedule
     </div>
     <h1>Luzern Kreuzstutz</h1>
+    <p class="hero-subtitle">Alle Züge, die täglich an der Baselstrasse beim Kreuzstutz vorbeifahren — mit interpolierten Durchfahrtszeiten.</p>
     <p class="hero-meta">Standort: <span>47.054°N, 8.297°E</span> · Strecke: <span>Luzern ↔ Emmenbrücke</span></p>
   </header>
 
   <!-- STATS -->
   <div class="stats-bar" id="stats-bar"></div>
+  <!-- HOURLY CHART -->
+  <section class="chart-section" id="chart-section">
+    <div class="chart-card">
+      <div class="chart-header">
+        <div class="chart-title-box">
+          <h2 class="chart-title">Züge pro Stunde</h2>
+          <p class="chart-subtitle" id="chart-subtitle">Verteilung der Durchfahrten am Kreuzstutz (00:00 – 23:00)</p>
+        </div>
+        <div class="chart-legend">
+          <div class="legend-item"><span class="legend-chip chip-an"></span> Ankunft Luzern</div>
+          <div class="legend-item"><span class="legend-chip chip-ab"></span> Abfahrt Luzern</div>
+          <div class="legend-meta" id="chart-meta"></div>
+        </div>
+      </div>
+      <div class="chart-container" id="chart-container"></div>
+      <div class="chart-footer-note">
+        Klicke auf einen Stunden-Balken, um direkt im Fahrplan dorthin zu springen.
+      </div>
+    </div>
+  </section>
 
   <!-- FILTERS -->
   <div class="filter-bar" id="filter-bar"></div>
@@ -532,24 +855,24 @@
 // === TRAIN IMAGES (Wikimedia Commons — freely licensed) ===
 const TRAIN_IMAGES = {
   'IC':   { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/FFS_RABDe_500_Olten.jpg/640px-FFS_RABDe_500_Olten.jpg', credit: 'SBB RABDe 500 ICN — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:FFS_RABDe_500_Olten.jpg' },
-  'IC21': { url: 'https://upload.wikimedia.org/wikipedia/commons/7/71/RABDe_500_ICN_EMU_-_54826117727.jpg?utm_source=en.wikipedia.org&utm_campaign=index&utm_content=original', credit: 'SBB RABDe 500 ICN — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:FFS_RABDe_500_Olten.jpg' },
-  'EC':   { url: 'https://www.sbb.ch/content/dam/internet/shared/images/zuege/giruno/Energieeffizienz.jpg/_jcr_content/renditions/cq5dam.web.1280.1280.jpeg', credit: 'EuroCity SBB — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_Re_420_Erstfeld.jpg' },
+  'IC21': { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/5/5a/FFS_RABDe_500_Olten.jpg/640px-FFS_RABDe_500_Olten.jpg', credit: 'SBB RABDe 500 ICN — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:FFS_RABDe_500_Olten.jpg' },
+  'EC':   { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/ac/SBB_Re_420_Erstfeld.jpg/640px-SBB_Re_420_Erstfeld.jpg', credit: 'EuroCity SBB — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_Re_420_Erstfeld.jpg' },
   'IR':   { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/SBB_Giruno_bei_Muri_AG.jpg/640px-SBB_Giruno_bei_Muri_AG.jpg', credit: 'SBB Giruno IR — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_Giruno_bei_Muri_AG.jpg' },
-  'IR15': { url: 'hhttps://i.ytimg.com/vi/JmsgJSJwpAA/maxresdefault.jpg', credit: 'SBB RABe 502 Twindexx IR15 — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_RABe_502_Twinsdexx_bei_Fribourg.jpg' },
-  'IR26': { url: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/f/fd/SOB_RABe_526_218_%2851809034225%29.jpg/960px-SOB_RABe_526_218_%2851809034225%29.jpg?utm_source=de.wikipedia.org&utm_campaign=parser&utm_content=thumbnail', credit: 'SBB Giruno IR26 — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_Giruno_bei_Muri_AG.jpg' },
-  'IR27': { url: 'https://live.staticflickr.com/65535/47901363031_5f0c6e722c_b.jpg', credit: 'SBB RABe 502 Twindexx IR27 — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_RABe_502_Twinsdexx_bei_Fribourg.jpg' },
-  'IR70': { url: 'https://i.ytimg.com/vi/Qn816BrU5iQ/maxresdefault.jpg', credit: 'SBB Giruno IR70 — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_Giruno_bei_Muri_AG.jpg' },
+  'IR15': { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/SBB_RABe_502_Twinsdexx_bei_Fribourg.jpg/640px-SBB_RABe_502_Twinsdexx_bei_Fribourg.jpg', credit: 'SBB RABe 502 Twindexx IR15 — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_RABe_502_Twinsdexx_bei_Fribourg.jpg' },
+  'IR26': { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/SBB_Giruno_bei_Muri_AG.jpg/640px-SBB_Giruno_bei_Muri_AG.jpg', credit: 'SBB Giruno IR26 — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_Giruno_bei_Muri_AG.jpg' },
+  'IR27': { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/SBB_RABe_502_Twinsdexx_bei_Fribourg.jpg/640px-SBB_RABe_502_Twinsdexx_bei_Fribourg.jpg', credit: 'SBB RABe 502 Twindexx IR27 — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_RABe_502_Twinsdexx_bei_Fribourg.jpg' },
+  'IR70': { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/ed/SBB_Giruno_bei_Muri_AG.jpg/640px-SBB_Giruno_bei_Muri_AG.jpg', credit: 'SBB Giruno IR70 — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_Giruno_bei_Muri_AG.jpg' },
   'IR75': { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e3/SBB_RABe_502_Twinsdexx_bei_Fribourg.jpg/640px-SBB_RABe_502_Twinsdexx_bei_Fribourg.jpg', credit: 'SBB RABe 502 Twindexx IR75 — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_RABe_502_Twinsdexx_bei_Fribourg.jpg' },
   'RE7':  { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/BLS_RABe_515_%22Mutz%22%2C_Spiez.jpg/640px-BLS_RABe_515_%22Mutz%22%2C_Spiez.jpg', credit: 'BLS RABe 515 "Mutz" RE7 — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:BLS_RABe_515_%22Mutz%22,_Spiez.jpg' },
   'RE24': { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/a/a6/BLS_RABe_515_%22Mutz%22%2C_Spiez.jpg/640px-BLS_RABe_515_%22Mutz%22%2C_Spiez.jpg', credit: 'BLS RABe 515 "Mutz" RE24 — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:BLS_RABe_515_%22Mutz%22,_Spiez.jpg' },
-  'S1':   { url: 'https://www.sbb.ch/content/dam/internet/shared/images/zuege/flirt/Flirt-Leman-Express-Bahnhof.jpg/_jcr_content/renditions/cq5dam.web.1280.1280.jpeg', credit: 'SBB RABe 520 GTW S-Bahn Luzern — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_RABe_520_GTW_Luzern_S-Bahn.jpg' },
-  'S6':   { url: 'https://upload.wikimedia.org/wikipedia/commons/6/64/BLS_MIKA_105_Burgdorf.jpg?utm_source=en.wikipedia.org&utm_campaign=index&utm_content=original', credit: 'SBB RABe 520 GTW S-Bahn Luzern — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_RABe_520_GTW_Luzern_S-Bahn.jpg' },
-  'S9':   { url: 'https://css.trainspo.com/uploads/photos/1024/1130-110559v0_20200506.jpg', credit: 'SBB RABe 520 GTW S-Bahn Luzern — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_RABe_520_GTW_Luzern_S-Bahn.jpg' },
-  'S77':  { url: 'https://thumb.wikimedia.org/wikipedia/commons/thumb/9/9a/RE_4178_Domodossola-Zweisimmen-Bern.jpg/3840px-RE_4178_Domodossola-Zweisimmen-Bern.jpg?utm_source=fr.wikipedia.org&utm_campaign=imageinfo&utm_content=thumbnail', credit: 'SBB RABe 520 GTW S-Bahn Luzern — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_RABe_520_GTW_Luzern_S-Bahn.jpg' },
-  'S99':  { url: 'https://css.trainspo.com/uploads/photos/1024/1130-110559v0_20200506.jpg', credit: 'SBB RABe 520 GTW S-Bahn Luzern — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_RABe_520_GTW_Luzern_S-Bahn.jpg' },
+  'S1':   { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/SBB_RABe_520_GTW_Luzern_S-Bahn.jpg/640px-SBB_RABe_520_GTW_Luzern_S-Bahn.jpg', credit: 'SBB RABe 520 GTW S-Bahn Luzern — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_RABe_520_GTW_Luzern_S-Bahn.jpg' },
+  'S6':   { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/SBB_RABe_520_GTW_Luzern_S-Bahn.jpg/640px-SBB_RABe_520_GTW_Luzern_S-Bahn.jpg', credit: 'SBB RABe 520 GTW S-Bahn Luzern — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_RABe_520_GTW_Luzern_S-Bahn.jpg' },
+  'S9':   { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/SBB_RABe_520_GTW_Luzern_S-Bahn.jpg/640px-SBB_RABe_520_GTW_Luzern_S-Bahn.jpg', credit: 'SBB RABe 520 GTW S-Bahn Luzern — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_RABe_520_GTW_Luzern_S-Bahn.jpg' },
+  'S77':  { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/SBB_RABe_520_GTW_Luzern_S-Bahn.jpg/640px-SBB_RABe_520_GTW_Luzern_S-Bahn.jpg', credit: 'SBB RABe 520 GTW S-Bahn Luzern — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_RABe_520_GTW_Luzern_S-Bahn.jpg' },
+  'S99':  { url: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/SBB_RABe_520_GTW_Luzern_S-Bahn.jpg/640px-SBB_RABe_520_GTW_Luzern_S-Bahn.jpg', credit: 'SBB RABe 520 GTW S-Bahn Luzern — Wikimedia Commons', creditUrl: 'https://commons.wikimedia.org/wiki/File:SBB_RABe_520_GTW_Luzern_S-Bahn.jpg' },
 };
 
-const FALLBACK_IMG = 'https://www.sbb.ch/content/dam/internet/shared/images/zuege/giruno/Energieeffizienz.jpg/_jcr_content/renditions/cq5dam.web.1280.1280.jpeg';
+const FALLBACK_IMG = 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8f/SBB_RABe_520_GTW_Luzern_S-Bahn.jpg/640px-SBB_RABe_520_GTW_Luzern_S-Bahn.jpg';
 
 function getTrainImage(line) {
   return TRAIN_IMAGES[line] || { url: FALLBACK_IMG, credit: 'Wikimedia Commons', creditUrl: '#' };
@@ -956,6 +1279,7 @@ function init() {
   });
 
   renderStats();
+  renderChart();
   renderFilters(lines);
   renderTimeline();
 }
@@ -981,6 +1305,131 @@ function renderStats() {
     <div class="stat"><div class="stat-value">${first}</div><div class="stat-label">Erster Zug</div></div>
     <div class="stat"><div class="stat-value">${last}</div><div class="stat-label">Letzter Zug</div></div>
   `;
+}
+
+// === HOURLY CHART RENDERING ===
+function renderChart() {
+  const container = document.getElementById('chart-container');
+  const metaContainer = document.getElementById('chart-meta');
+  const subtitle = document.getElementById('chart-subtitle');
+  if (!container) return;
+
+  const trains = getFilteredTrains();
+
+  // Aggregate trains per hour (00 to 23)
+  const hoursData = Array.from({ length: 24 }, (_, i) => ({
+    hour: i,
+    hourStr: String(i).padStart(2, '0'),
+    an: 0,
+    ab: 0,
+    total: 0
+  }));
+
+  trains.forEach(t => {
+    const h = parseInt(t.zeit_punkt.substring(0, 2), 10);
+    if (h >= 0 && h < 24) {
+      if (t.richtung === 'an') hoursData[h].an++;
+      else if (t.richtung === 'ab') hoursData[h].ab++;
+      hoursData[h].total++;
+    }
+  });
+
+  const totals = hoursData.map(h => h.total);
+  const maxCount = Math.max(...totals, 1);
+  const totalTrains = totals.reduce((a, b) => a + b, 0);
+
+  const activeHours = totals.filter(t => t > 0).length || 1;
+  const avgTrains = (totalTrains / activeHours).toFixed(1);
+
+  const peakVal = Math.max(...totals);
+  const peakHours = hoursData
+    .filter(h => h.total === peakVal && peakVal > 0)
+    .map(h => `${h.hourStr}:00`);
+
+  if (metaContainer) {
+    if (totalTrains > 0) {
+      metaContainer.innerHTML = `Spitze: <strong>${peakVal} Züge</strong> (${peakHours.join(', ')}) &nbsp;·&nbsp; Ø <strong>${avgTrains}</strong> / Aktivstunde`;
+    } else {
+      metaContainer.innerHTML = `Keine Züge im Filter`;
+    }
+  }
+
+  if (subtitle) {
+    const isFiltered = activeLines.size > 0 ||
+      (document.querySelector('.dir-btn.dir-an')?.classList.contains('active') !==
+       document.querySelector('.dir-btn.dir-ab')?.classList.contains('active'));
+    subtitle.textContent = isFiltered
+      ? `Gefiltert (${totalTrains} Züge) — Klick auf Balken springt zur Stunde`
+      : `Tagesverlauf am Kreuzstutz (00:00 – 23:00) — Klick auf Balken springt zur Stunde`;
+  }
+
+  // Grid background
+  let html = `<div class="chart-grid">
+    <div class="chart-grid-line"><span>${maxCount}</span></div>
+    <div class="chart-grid-line"><span>${Math.round(maxCount / 2)}</span></div>
+    <div class="chart-grid-line"><span>0</span></div>
+  </div>`;
+
+  html += `<div class="chart-bars">`;
+
+  hoursData.forEach(h => {
+    const isZero = h.total === 0;
+    const isPeak = h.total === peakVal && peakVal > 3;
+    const heightPct = isZero ? 0 : Math.max(8, (h.total / maxCount) * 100);
+    const anPct = h.total > 0 ? (h.an / h.total) * 100 : 0;
+    const abPct = h.total > 0 ? (h.ab / h.total) * 100 : 0;
+
+    html += `
+      <div class="chart-col ${isPeak ? 'is-peak' : ''}" onclick="jumpToHour('${h.hourStr}')" title="${h.hourStr}:00 – ${h.total} Züge">
+        ${!isZero ? `<span class="bar-count-tag">${h.total}</span>` : ''}
+
+        <div class="bar-track ${isZero ? 'is-zero' : ''}" style="${isZero ? '' : `height: ${heightPct}%;`}">
+          ${h.an > 0 ? `<div class="bar-seg seg-an" style="height: ${anPct}%;"></div>` : ''}
+          ${h.ab > 0 ? `<div class="bar-seg seg-ab" style="height: ${abPct}%;"></div>` : ''}
+        </div>
+
+        <span class="chart-hour-label">${h.hourStr}</span>
+
+        <div class="chart-tooltip">
+          <div class="tooltip-title">
+            <span>${h.hourStr}:00 – ${h.hourStr}:59</span>
+          </div>
+          <div class="tooltip-row">
+            <strong>${h.total}</strong> Züge ${isPeak ? '🔥 (Spitzenstunde)' : ''}
+          </div>
+          ${h.an > 0 ? `
+            <div class="tooltip-row">
+              <span class="tooltip-dot" style="background:var(--arrival)"></span>
+              ${h.an} Ankünfte (Luzern)
+            </div>
+          ` : ''}
+          ${h.ab > 0 ? `
+            <div class="tooltip-row">
+              <span class="tooltip-dot" style="background:var(--departure)"></span>
+              ${h.ab} Abfahrten (Luzern)
+            </div>
+          ` : ''}
+          ${!isZero ? `<div class="tooltip-hint">Klick: Zur Stunde springen ↓</div>` : ''}
+        </div>
+      </div>
+    `;
+  });
+
+  html += `</div>`;
+  container.innerHTML = html;
+}
+
+function jumpToHour(hourStr) {
+  const el = document.getElementById(`hour-${hourStr}`);
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    el.style.transition = 'background 0.4s ease, border-radius 0.4s ease';
+    el.style.background = 'rgba(255, 255, 255, 0.05)';
+    el.style.borderRadius = '16px';
+    setTimeout(() => {
+      el.style.background = '';
+    }, 1500);
+  }
 }
 
 function renderFilters(lines) {
@@ -1016,12 +1465,14 @@ function renderFilters(lines) {
         activeLines.delete(btn.dataset.line);
       }
       renderTimeline();
+      renderChart();
     });
   });
 }
 
 function updateFilter() {
   renderTimeline();
+  renderChart();
 }
 
 function getFilteredTrains() {
@@ -1060,7 +1511,7 @@ function renderTimeline() {
   sortedHours.forEach(hour => {
     const group = hourGroups[hour];
 
-    html += `<div class="hour-group">`;
+    html += `<div class="hour-group" id="hour-${hour}">`;
     html += `<div class="hour-header">`;
     html += `<span class="hour-time">${hour}:00</span>`;
     html += `<span class="hour-line"></span>`;
